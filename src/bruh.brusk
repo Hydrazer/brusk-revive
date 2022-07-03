@@ -1,8 +1,8 @@
 fn main() {
-  println!("{:?}", line0(69.0_f64));
+  println!("{:?}", line0(4200.0_f64, 10.0_f64));
 }
-fn line0(arg_0: f64) -> f64 {
-  modulus(negate(5_f64), arg_0)
+fn line0(arg_0: f64, arg_1: f64) -> f64 {
+  plus(negate(negate(69_f64)), mul(arg_0, arg_1))
 }
 
 fn negate(a: f64) -> f64 {

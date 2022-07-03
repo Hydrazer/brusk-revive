@@ -30,13 +30,6 @@ fn sub(a: f64, b:f64) -> f64 {
 pub struct Transpile {
   pub parse_line_fn_hash: HashMap<usize, Ast>,
   pub env_arg_ind: isize,
-  /* pub env_arg_vec: Vec<Token>,
-  pub env_arg_ind: isize, */
-  /* token_vec: Vec<Token>,
-  line_fn_arg_vec: Vec<Option<Vec<Option>>>,
-  line_fn_arg_vec: Vec<Option<Vec<Option>>>, */
-  // line_fn_arg_vec: Vec<Token>,
-  // line_fn_arg_vec: Vec<Token>,
 }
 
 impl Transpile {
@@ -54,11 +47,8 @@ impl Transpile {
   {}
 }}",
         k,
-        // "".to_string(),
-        /* match  {
-        Some(l) => { */
         arg_vec
-          .clone()
+					.clone()
           .into_iter()
           .enumerate()
           .map(|(idx, v)| format!("arg_{idx}: {}", v.typ.rust_typ()))
@@ -69,16 +59,7 @@ impl Transpile {
         },  */
         self.transpile_node(node.clone())
       );
-      /* (match v.line_fn_arg_vec[k].clone() {
-          Some(l) => {
-            l.into_iter().enumerate().map(|(idx, v)| => format!("arg_{idx}: {}", v.typ.rust_typ())).collect::<Vec<_>>().join(", ")
-          }
-          None => "".to_string()
-      }),
-
-      self.transpile_node(node.clone())); */
       out_vec[k] = code;
-      // println!("node {:#?} || line fn arg vec {:#?}\n\n", node, v.line_fn_arg_vec[k]);
     }
     format!(
       r###"fn main() {{

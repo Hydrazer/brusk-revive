@@ -73,6 +73,7 @@ impl Lexer {
           }));
           self.advance();
         }
+
         c if "₀₁₂₃₄".contains(c) => {
           token_vec.push(Token::new(Token {
             typ: TokenType::LINE_F,
@@ -82,7 +83,7 @@ impl Lexer {
           }));
           self.advance();
         }
-        c if "⁰".contains(c) => {
+        c if VAR_STR.contains(c) => {
           token_vec.push(Token::new(Token {
             typ: TokenType::VAR,
             value: Some(TokenVal::VAR(c.to_string())),
@@ -197,15 +198,6 @@ impl Lexer {
       }
     }
 
-    /* token_vec[0].push(Token::new(Token {
-      typ: TokenType::NEWLINE,
-      pos_start: curr_pos,
-      ..Default::default()
-    })); */
-
-    // vec.retain(|&x| x % 2 == 0);
-    // token_vec.retain(|&t| t.len() > 0);
-    // token_vec.reverse();
     Ok(token_vec)
   }
 

@@ -61,14 +61,7 @@ impl Parser {
         .lock()
         .unwrap()
         .insert(self.pos.ln as usize, res.clone());
-      /* if self.tok_idx == 0 {
-        for (k, v) in res.parse_line_fn_hash.clone() {
-          FN_HASH.insert(k, v);
-          let mut b = FN_HASH.get_mut(&0).unwrap();
-          b.parse_line_fn_hash.remove(&k);
-        }
-      } */
-      // println!("curr tok {:#?}", self.curr_tok.clone());
+
       match self.curr_tok.clone() {
         Some(ct) => {
           match ct.clone().typ {
@@ -96,15 +89,6 @@ impl Parser {
   }
 
   pub fn expr(&mut self) -> Ast {
-    /* match self.curr_tok.unwrap() {
-      Some(tok) => {
-
-      }
-
-      None => unreachable!()
-      // Some()
-    } */
-    // return self.
     self.binop()
   }
 
@@ -366,7 +350,7 @@ impl Ast {
   }
 }
 
-#[derive(Clone, Debug)]
+/* #[derive(Clone, Debug)]
 pub struct SymbolTable {
   pub symbol_hash: HashMap<String, Token>,
   pub parent: Option<Box<SymbolTable>>,
@@ -405,4 +389,4 @@ impl SymbolTable {
   fn remove(&mut self, name: String) {
     self.symbol_hash.remove(&name);
   }
-}
+} */
