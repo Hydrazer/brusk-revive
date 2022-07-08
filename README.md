@@ -8,12 +8,13 @@ regretting your life decisions
 	- _ (negation)
 	- *, -, %, /, +
 	- parameters via argv (⁰¹²³⁴⁵⁷⁸⁹)
+	- List
+	- Map like functions
 
 - what to do
 	- char
-	- list
-	- map like functions
 	- lazy evaluation
+	- comparisons
 	- if statements
 	- line function
 
