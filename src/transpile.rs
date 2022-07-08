@@ -34,7 +34,7 @@ fn map(a: &dyn Fn(f64) -> f64, b: Vec<f64>) -> Vec<f64> {
 macro_rules! cons {
   ($x:expr, $l:expr) => {{
     let mut l = $l;
-    l.push($x);
+    l.insert(0, $x);
     l
   }};
 }
