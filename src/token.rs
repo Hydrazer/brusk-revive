@@ -89,11 +89,17 @@ pub enum TokenType {
   MOD,
   SHOW,
   NEGATE,
+  LIST_EMPTY,
+  CONS,
+  FUNC(Vec<TokenType>)
 }
 
 impl TokenType {
   pub fn arg_vec(&self) -> Vec<TokenType> {
     match self.clone() {
+      TokenType::MAP => {
+        vec![TokenType::FLOAT, TokenType::LIST_EMPTY]
+      }
       TokenType::NEGATE => {
         vec![TokenType::FLOAT]
       }
@@ -101,7 +107,11 @@ impl TokenType {
         vec![TokenType::FLOAT, TokenType::FLOAT]
       }
 
-      TokenType::FLOAT => vec![],
+      TokenType::CONS => {
+        vec![TokenType::FLOAT, TokenType::LIST_EMPTY]
+      }
+
+      TokenType::FLOAT | TokenType::LIST_EMPTY => vec![],
 
       _ => unreachable!(),
     }
@@ -129,6 +139,12 @@ impl TokenType {
         Ok(TokenType::FLOAT)
         // vec![TokenType::FLOAT, TokenType::FLOAT]
       }
+      TokenType::CONS => {
+          Ok(TokenType::LIST_EMPTY)
+      }
+      TokenType::MAP => {
+          Ok(TokenType::LIST_EMPTY)
+      }
 
       /* TokenType::TWO_F(tt) => {
         match tt {
@@ -144,6 +160,8 @@ impl TokenType {
   pub fn rust_typ(&self) -> String {
     match self {
       TokenType::FLOAT => "f64".to_string(),
+      TokenType::LIST_EMPTY => "Vec<f64>".to_string(),
+      TokenType::CONS => "Vec<f64>".to_string(),
       _ => unreachable!(),
     }
   }
@@ -154,4 +172,5 @@ pub enum TokenVal {
   FLOAT(f64),
   VAR(String),
   LINE_F(String),
+  LIST(Vec<TokenVal>),
 }
