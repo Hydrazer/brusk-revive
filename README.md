@@ -17,6 +17,7 @@ regretting your life decisions
 	- comparisons
 	- if statements
 	- line function
+	- recursion recursion recursion
 
 src/bruh.hs
 <br>
@@ -29,10 +30,10 @@ src/bruh.hs
 `42069`
 
 ```haskell
-m + 1 ⁰ : 69 : 3 ∅
+m %3⁰ m +1⁰ : 69 : 3 ∅
 ```
 
 `cd src && cargo run "bruh.hs"`
 <br>
-`[70.0, 4.0]`
+`[4.0, 0.0]`
 

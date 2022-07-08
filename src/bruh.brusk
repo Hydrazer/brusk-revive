@@ -2,7 +2,7 @@ fn main() {
   println!("{:?}", line0());
 }
 fn line0() -> Vec<f64> {
-  map(&|arg_0_1| plus(1_f64, arg_0_1), cons!(69_f64, cons!(3_f64, vec![])))
+  map(&|arg_0_1| modulus(4_f64, arg_0_1), map(&|arg_0_2| plus(1_f64, arg_0_2), cons!(69_f64, cons!(3_f64, vec![]))))
 }
 
 fn negate(a: f64) -> f64 {

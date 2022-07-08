@@ -1,4 +1,5 @@
 use crate::node::*;
+use crate::basic::*;
 use crate::parser::*;
 use crate::token::*;
 use std::collections::HashMap;
@@ -102,7 +103,7 @@ impl Transpile {
             }
             _ => unreachable!()
         },
-        self.transpile_node(node.clone(), 0)
+        self.transpile_node(node.clone(), 0, false)
       );
       /* (match v.line_fn_arg_vec[k].clone() {
           Some(l) => {
@@ -141,11 +142,12 @@ impl Transpile {
     // "".to_string()
   }
 
-  pub fn transpile_node(&mut self, node: Node, depth: usize) -> String {
+  pub fn transpile_node(&mut self, node: Node, depth: usize, is_map_first: bool) -> String {
     match node.clone() {
       Node::BinOpNode {
         op_tok, arg_vec, ..
       } => {
+        let mut depth_curr = depth;
         println!("binopnode");
         arg_vec
           .clone()
@@ -159,9 +161,10 @@ impl Transpile {
           TokenType::MINUS => "sub",
           TokenType::MOD => "modulus",
           TokenType::CONS => "cons!",
-          TokenType::MAP => "map",
+          TokenType::MAP => {depth_curr += 1;"map"},
           _ => unreachable!(),
         };
+        println!("this is arg vec {:#?}", arg_vec);
         let fmter = format!(
           "{}({})",
           tok_str,
@@ -173,14 +176,14 @@ impl Transpile {
               // println!("btw a {:#?}", a);
             (match a {
                 Some(a) => {
-                    self.transpile_node(a, match (i, op_tok.clone().typ) {
-                        (0, TokenType::MAP) => depth + 1,
-                        _ => depth 
+                    self.transpile_node(a, depth_curr, match (i, op_tok.clone().typ) {
+                        (0, TokenType::MAP) => true,
+                        _ => false
                     }) 
                 } 
             None => {
-                self.env_arg_ind += 1;
-                format!("arg_{}_{}", self.env_arg_ind, depth)
+                // self.env_arg_ind += 1;
+                format!("arg_{}_{}", self.env_arg_ind, depth_curr)
             } 
 
 
@@ -189,9 +192,9 @@ impl Transpile {
             .join(", ")
         );
 
-        match depth {
-            0 => fmter,
-            dp => {format!("&|arg_0_{}| {}", dp, fmter)}
+        match is_map_first {
+            false => fmter,
+            _ => {format!("&|arg_0_{}| {}", depth_curr, fmter)}
         }
       }
 
@@ -213,8 +216,9 @@ impl Transpile {
           ),
           TokenType::VAR => match tok.value.clone().unwrap().clone() {
             TokenVal::VAR(v) => {
-              self.env_arg_ind += 1;
-              format!("arg_{}_{}", self.env_arg_ind, depth)
+              // self.env_arg_ind += 1;
+             
+              format!("arg_{}_{}", VAR_STR.chars().position(|c| c.to_string() == v).unwrap(), depth)
             }
             _ => unreachable!(),
           },

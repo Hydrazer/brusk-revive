@@ -12,13 +12,13 @@ pub struct Number {
   pub context: Option<Context>,
 }
 
-#[derive(Clone, Debug)]
+/* #[derive(Clone, Debug)]
 pub struct Number {
   pub value: f64,
   pub pos_start: Option<Position>,
   pub pos_end: Option<Position>,
   pub context: Option<Context>,
-}
+} */
 
 
 /* #[derive(Clone)]
