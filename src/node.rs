@@ -19,16 +19,12 @@ pub enum Node {
     pos_start: Option<Position>,
     pos_end: Option<Position>,
   },
-}
 
-pub struct BinOpNode {
-  pub op_tok: Token,
-  pub arg_vec: Vec<Option<Node>>,
-  /* left_node: Box<Node>,
-  right_node: Box<Node>,
-  op_tok: Token, */
-  pub pos_start: Option<Position>,
-  pub pos_end: Option<Position>,
+  ListNode {
+    tok_vec: Vec<Token>,
+    pos_start: Option<Position>,
+    pos_end: Option<Position>,
+  },
 }
 
 impl fmt::Debug for Node {
@@ -51,6 +47,9 @@ impl fmt::Debug for Node {
 
       Node::NumberNode { tok, .. } => {
         write!(f, "{:?}", tok)
+      }
+      Node::ListNode { tok_vec, .. } => {
+        write!(f, "{:?}", tok_vec)
       }
     }
   }

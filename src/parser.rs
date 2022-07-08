@@ -61,7 +61,14 @@ impl Parser {
         .lock()
         .unwrap()
         .insert(self.pos.ln as usize, res.clone());
-
+      /* if self.tok_idx == 0 {
+        for (k, v) in res.parse_line_fn_hash.clone() {
+          FN_HASH.insert(k, v);
+          let mut b = FN_HASH.get_mut(&0).unwrap();
+          b.parse_line_fn_hash.remove(&k);
+        }
+      } */
+      // println!("curr tok {:#?}", self.curr_tok.clone());
       match self.curr_tok.clone() {
         Some(ct) => {
           match ct.clone().typ {
@@ -89,6 +96,15 @@ impl Parser {
   }
 
   pub fn expr(&mut self) -> Ast {
+    /* match self.curr_tok.unwrap() {
+      Some(tok) => {
+
+      }
+
+      None => unreachable!()
+      // Some()
+    } */
+    // return self.
     self.binop()
   }
 
@@ -154,12 +170,17 @@ impl Parser {
         /* TokenType::NEGATE => {
 
         } */
+        /* TokenType::MAP => {
+            self.advance();
+              let mut arg_vec = vec![];
+        } */
         TokenType::PLUS
         | TokenType::MINUS
         | TokenType::DIV
         | TokenType::MUL
         | TokenType::MOD
-        | TokenType::NEGATE => {
+        | TokenType::NEGATE
+        | TokenType::CONS  | TokenType::MAP => {
           self.advance();
 
           let mut arg_vec = vec![];
@@ -198,13 +219,14 @@ impl Parser {
               }; */
               break;
             } else {
-              let typer = match child.clone().unwrap() {
+              /* let typer = match child.clone().unwrap() {
                 Node::BinOpNode { op_tok, .. } => op_tok,
                 Node::NumberNode { tok, .. } => tok,
+                Node::ListNode { tok, .. } => tok,
               };
               match typer.typ {
                 _ => {}
-              }
+              } */
             }
 
             if res.error.is_some() {
@@ -218,8 +240,18 @@ impl Parser {
                 TokenType::FLOAT
                 // tok.typ.return_typ(self.clone()).unwrap()
               }
+              Node::ListNode { tok_vec, .. } => {
+                TokenType::LIST_EMPTY
+                /* match tok_vec.into_iter().nth(0) {
+                    Some(tok) => tok.typ,
+                    None => TokenType::LIST_EMPTY
+                } */
+                // TokenType::FLOAT
+                // tok.typ.return_typ(self.clone()).unwrap()
+              }
             };
 
+            println!("checking currtok child ret type and arg typ {:#?} || {:#?} || {:#?}",curr_tok, child_ret_typ, arg_typ);
             if child_ret_typ != arg_typ {
               // return res.error
               return res.failure(Error {
@@ -243,6 +275,7 @@ impl Parser {
                 Some(Node::BinOpNode { pos_start, .. }) => pos_start,
 
                 Some(Node::NumberNode { pos_start, .. }) => pos_start,
+                Some(Node::ListNode { pos_end, .. }) => pos_end,
                 _ => None,
               },
               None => None,
@@ -252,6 +285,7 @@ impl Parser {
                 Some(Node::BinOpNode { pos_end, .. }) => pos_end,
 
                 Some(Node::NumberNode { pos_end, .. }) => pos_end,
+                Some(Node::ListNode { pos_end, .. }) => pos_end,
                 None => None,
               },
               None => None,
@@ -260,6 +294,37 @@ impl Parser {
 
           return res.success(parent, vec![], None);
         }
+        TokenType::LIST_EMPTY => {
+
+            self.advance();
+            return res.success(
+              Some(Node::ListNode {
+                tok_vec: vec![],
+                pos_start: ps.clone(),
+                pos_end: Some(self.pos.clone()),
+              }),
+              vec![],
+              None,
+            );
+          /* let fac = self.factor();
+          println!("reach int / float {:#?}", fac);
+          return fac; */
+        }
+        /* TokenType::CONS => {
+            self.advance();
+            return res.success(
+              Some(Node::ListNode {
+                tok_vec: vec![],
+                pos_start: ps.clone(),
+                pos_end: Some(self.pos.clone()),
+              }),
+              vec![],
+              None,
+            );
+          /* let fac = self.factor();
+          println!("reach int / float {:#?}", fac);
+          return fac; */
+        } */
 
         TokenType::INT | TokenType::FLOAT => {
           let fac = self.factor();
@@ -350,7 +415,7 @@ impl Ast {
   }
 }
 
-/* #[derive(Clone, Debug)]
+#[derive(Clone, Debug)]
 pub struct SymbolTable {
   pub symbol_hash: HashMap<String, Token>,
   pub parent: Option<Box<SymbolTable>>,
@@ -389,4 +454,4 @@ impl SymbolTable {
   fn remove(&mut self, name: String) {
     self.symbol_hash.remove(&name);
   }
-} */
+}

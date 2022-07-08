@@ -25,11 +25,31 @@ fn modulus(a: f64, b:f64) -> f64 {
 fn sub(a: f64, b:f64) -> f64 {
   a - b
 }
+
+fn map(a: &dyn Fn(f64) -> f64, b: Vec<f64>) -> Vec<f64> {
+  b.clone().into_iter().map(|x| a(x)).collect()
+}
+
+#[macro_export]
+macro_rules! cons {
+  ($x:expr, $l:expr) => {{
+    let mut l = $l;
+    l.push($x);
+    l
+  }};
+}
 ";
 
 pub struct Transpile {
   pub parse_line_fn_hash: HashMap<usize, Ast>,
   pub env_arg_ind: isize,
+  /* pub env_arg_vec: Vec<Token>,
+  pub env_arg_ind: isize, */
+  /* token_vec: Vec<Token>,
+  line_fn_arg_vec: Vec<Option<Vec<Option>>>,
+  line_fn_arg_vec: Vec<Option<Vec<Option>>>, */
+  // line_fn_arg_vec: Vec<Token>,
+  // line_fn_arg_vec: Vec<Token>,
 }
 
 impl Transpile {
@@ -41,14 +61,18 @@ impl Transpile {
       .collect::<Vec<_>>();
     for (k, v) in self.parse_line_fn_hash.clone() {
       let node = v.node.unwrap();
+      println!("what on earth this deez nuts node ||  {:#?}", node);
       // matc
       let code = format!(
-        "fn line{}({}) -> f64 {{
+        "fn line{}({}) -> {} {{
   {}
 }}",
         k,
+        // "".to_string(),
+        /* match  {
+        Some(l) => { */
         arg_vec
-					.clone()
+          .clone()
           .into_iter()
           .enumerate()
           .map(|(idx, v)| format!("arg_{idx}: {}", v.typ.rust_typ()))
@@ -57,9 +81,39 @@ impl Transpile {
         /* }
             None => "".to_string()
         },  */
-        self.transpile_node(node.clone())
+        match node.clone() {
+            Node::ListNode {..} => {
+                "Vec<f64>"
+            }
+            Node::NumberNode {..} => {
+                "f64"
+            }
+            Node::BinOpNode {op_tok, ..} => {
+                match op_tok.typ.clone() {
+                    TokenType::LIST_EMPTY => {
+                        "Vec<f64>"
+                    }
+                    TokenType::CONS | TokenType::MAP => {
+                        "Vec<f64>"
+                    }
+                    _ => "f64"
+                }
+                // "f64"
+            }
+            _ => unreachable!()
+        },
+        self.transpile_node(node.clone(), 0)
       );
+      /* (match v.line_fn_arg_vec[k].clone() {
+          Some(l) => {
+            l.into_iter().enumerate().map(|(idx, v)| => format!("arg_{idx}: {}", v.typ.rust_typ())).collect::<Vec<_>>().join(", ")
+          }
+          None => "".to_string()
+      }),
+
+      self.transpile_node(node.clone())); */
       out_vec[k] = code;
+      // println!("node {:#?} || line fn arg vec {:#?}\n\n", node, v.line_fn_arg_vec[k]);
     }
     format!(
       r###"fn main() {{
@@ -87,7 +141,7 @@ impl Transpile {
     // "".to_string()
   }
 
-  pub fn transpile_node(&mut self, node: Node) -> String {
+  pub fn transpile_node(&mut self, node: Node, depth: usize) -> String {
     match node.clone() {
       Node::BinOpNode {
         op_tok, arg_vec, ..
@@ -97,37 +151,48 @@ impl Transpile {
           .clone()
           .into_iter()
           .for_each(|a| println!("{:#?}", a));
-        let tok_str = match op_tok.typ {
+        let tok_str = match op_tok.clone().typ {
           TokenType::PLUS => "plus",
           TokenType::NEGATE => "negate",
           TokenType::MUL => "mul",
           TokenType::DIV => "div",
           TokenType::MINUS => "sub",
           TokenType::MOD => "modulus",
+          TokenType::CONS => "cons!",
+          TokenType::MAP => "map",
           _ => unreachable!(),
         };
-        format!(
+        let fmter = format!(
           "{}({})",
           tok_str,
           arg_vec
             .clone()
             .into_iter()
-            .map(|a| 
+            .enumerate()
+            .map(|(i, a)| 
               // println!("btw a {:#?}", a);
             (match a {
                 Some(a) => {
-                    self.transpile_node(a) 
+                    self.transpile_node(a, match (i, op_tok.clone().typ) {
+                        (0, TokenType::MAP) => depth + 1,
+                        _ => depth 
+                    }) 
                 } 
             None => {
                 self.env_arg_ind += 1;
-                format!("arg_{}", self.env_arg_ind)
+                format!("arg_{}_{}", self.env_arg_ind, depth)
             } 
 
 
         }))
             .collect::<Vec<_>>()
             .join(", ")
-        )
+        );
+
+        match depth {
+            0 => fmter,
+            dp => {format!("&|arg_0_{}| {}", dp, fmter)}
+        }
       }
 
       Node::NumberNode { tok, .. } => {
@@ -149,7 +214,7 @@ impl Transpile {
           TokenType::VAR => match tok.value.clone().unwrap().clone() {
             TokenVal::VAR(v) => {
               self.env_arg_ind += 1;
-              format!("arg_{}", self.env_arg_ind)
+              format!("arg_{}_{}", self.env_arg_ind, depth)
             }
             _ => unreachable!(),
           },
@@ -157,8 +222,12 @@ impl Transpile {
         }
         // println!("numbernode {:#?}", tok);
       }
+      Node::ListNode {.. } => {
+        format!("vec![]")
+      }
       _ => unreachable!(),
       // Node::VarAccessNode {..}
+
     }
   }
 }
