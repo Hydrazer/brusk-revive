@@ -218,7 +218,10 @@ impl Transpile {
             TokenVal::VAR(v) => {
               // self.env_arg_ind += 1;
              
-              format!("arg_{}_{}", VAR_STR.chars().position(|c| c.to_string() == v).unwrap(), depth)
+              match depth {
+                0 => format!("arg_{}", VAR_STR.chars().position(|c| c.to_string() == v).unwrap()),
+                _ => format!("arg_{}_{}", VAR_STR.chars().position(|c| c.to_string() == v).unwrap(), depth),
+              }
             }
             _ => unreachable!(),
           },

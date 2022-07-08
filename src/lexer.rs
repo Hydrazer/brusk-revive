@@ -91,6 +91,7 @@ impl Lexer {
           }));
           self.advance();
         }
+
         c if "₀₁₂₃₄".contains(c) => {
           token_vec.push(Token::new(Token {
             typ: TokenType::LINE_F,
@@ -100,7 +101,8 @@ impl Lexer {
           }));
           self.advance();
         }
-        c if "⁰".contains(c) => {
+
+        c if VAR_STR.contains(c) => {
           token_vec.push(Token::new(Token {
             typ: TokenType::VAR,
             value: Some(TokenVal::VAR(c.to_string())),
