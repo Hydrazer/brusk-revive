@@ -27,3 +27,11 @@ src/bruh.hs
 <br>
 `42069`
 
+```haskell
+m + 1 ⁰ : 69 : 3 ∅
+```
+
+`cd src && cargo run "bruh.hs"`
+<br>
+`[70.0, 4.0]`
+
